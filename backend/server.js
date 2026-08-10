@@ -27,12 +27,29 @@ app.use(helmet());
 
 const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
   .split(',')
-  .map((s) => s.trim());
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+// The Android app (Capacitor, see /android or the built .apk) serves its
+// bundled UI from a fixed WebView origin - NOT whatever CLIENT_ORIGIN is set
+// to on Render for the web frontend(s). Without these, every write from the
+// mobile app (create worker, post a labour entry, ...) is silently blocked
+// by CORS before it ever reaches a route handler: the browser/WebView never
+// sends the request through, axios reports a generic network error, and the
+// UI shows "Failed to save" with nothing in MongoDB - which looks exactly
+// like "the site isn't storing data" from the user's side. These are fixed,
+// well-known hybrid-app origins (not attacker-controllable), so allowing
+// them unconditionally alongside CLIENT_ORIGIN is safe - auth here is a
+// Bearer token in the Authorization header (see frontend/src/api/client.js),
+// not cookies, so this isn't a CSRF surface.
+const MOBILE_APP_ORIGINS = ['https://localhost', 'capacitor://localhost', 'http://localhost'];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      if (!origin || allowedOrigins.includes(origin) || MOBILE_APP_ORIGINS.includes(origin)) {
+        return callback(null, true);
+      }
       callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
