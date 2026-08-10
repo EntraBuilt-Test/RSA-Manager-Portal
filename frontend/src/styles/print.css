@@ -1,0 +1,239 @@
+/* ============================================================
+   Print / PDF layouts - these are the documents that replace
+   the physical Delivery Note pad and Material Purchase Ledger.
+   Kept visually plain (ruled lines, serif-ish numerals) to match
+   the paper forms rather than the app's modern admin styling.
+   Deliberately NOT theme-aware (no dark mode here) - printed
+   output should always look like white paper.
+   ============================================================ */
+
+.print-page-wrapper { background: #e9eaec; min-height: 100vh; padding: 24px; }
+.print-toolbar { max-width: 800px; margin: 0 auto 16px; display: flex; justify-content: space-between; }
+.print-toolbar-actions { display: flex; gap: 10px; }
+
+.delivery-note-sheet {
+  position: relative;
+  background: white;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 14mm;
+  border: 1px solid #999;
+  font-family: 'Noto Sans Tamil', 'Inter', sans-serif;
+  color: #111;
+  /* Without this, browsers frequently drop background/watermark images when
+     printing/saving as PDF even though the sheet is meant to look like white
+     paper with a faint company mark behind the text. */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+/* Low-opacity logo watermark centered behind the whole printed page, matching
+   the Voucher slip's already-branded look. Sits behind every other element on
+   the sheet via the z-index rule below. */
+.dn-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  opacity: 0.16;
+  /* The source logo file is already blue - darken/desaturate it a touch so a
+     bolder, more visible watermark still reads as a faint background mark
+     rather than a second, competing splash of color behind the text. */
+  filter: grayscale(1) contrast(1.15);
+  pointer-events: none;
+  z-index: 0;
+}
+.delivery-note-sheet > *:not(.dn-watermark) { position: relative; z-index: 1; }
+
+/* Vehicle + Receiver photos on the printed sheet - medium side-by-side boxes
+   placed after the declaration line, above the vehicle no./signature block. */
+.dn-photos-row { display: flex; gap: 14px; margin-top: 12px; page-break-inside: avoid; }
+.dn-photo-box { flex: 1; text-align: center; font-size: 10px; color: #333; }
+.dn-photo-box img {
+  width: 100%;
+  max-width: 240px;
+  height: 150px;
+  object-fit: cover;
+  border: 1px solid #333;
+  border-radius: 4px;
+  display: block;
+  margin: 0 auto 4px;
+}
+
+.dn-header-top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--brand-red, #0056cc); padding-bottom: 4px; }
+.dn-company-name { color: var(--brand-red, #0056cc); font-size: 26px; margin: 0; letter-spacing: 0.5px; }
+.dn-company-name-ta { color: var(--brand-red, #0056cc); font-size: 15px; font-weight: 700; }
+.dn-cell-block { text-align: right; color: var(--brand-red, #0056cc); font-size: 12px; font-weight: 700; }
+.dn-address { font-size: 12px; margin-top: 4px; }
+.dn-address-ta { font-size: 12px; }
+.dn-rental-note { font-size: 10px; font-style: italic; color: #444; margin-top: 4px; border-bottom: 1px solid #999; padding-bottom: 6px; }
+
+.dn-title-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; }
+.dn-title { margin: 0; font-size: 18px; text-decoration: underline; letter-spacing: 1px; }
+.dn-title-ta { font-size: 12px; }
+.dn-meta-block { text-align: right; font-size: 13px; }
+.dn-meta-row { display: flex; gap: 6px; justify-content: flex-end; }
+.dn-meta-label { font-weight: 700; }
+
+.dn-customer-row { margin-top: 10px; font-size: 13px; border-top: 1px solid #333; border-bottom: 1px solid #333; padding: 6px 0; }
+
+.dn-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+.dn-table th, .dn-table td { border: 1px solid #333; padding: 3px 6px; }
+.dn-table thead th { background: #f0f0f0; font-weight: 700; text-align: center; }
+.dn-table tr { page-break-inside: avoid; }
+.dn-table thead { display: table-header-group; }
+.dn-col-no { width: 30px; text-align: center; }
+.dn-col-particulars { text-align: left; }
+.dn-col-qty { width: 70px; text-align: center; }
+.dn-col-extra { width: 80px; text-align: center; }
+.dn-col-amount { width: 90px; text-align: right; }
+.dn-total-row td { font-weight: 700; border-top: 2px solid #333; }
+
+.dn-declaration { font-size: 10px; margin-top: 8px; font-style: italic; }
+
+.dn-footer-row { display: flex; justify-content: space-between; margin-top: 14px; font-size: 12px; }
+.dn-underline { border-bottom: 1px solid #333; padding: 0 20px; }
+
+.dn-signature-row { display: flex; justify-content: space-between; margin-top: 40px; font-size: 11px; text-align: center; page-break-inside: avoid; }
+.dn-signature-block { width: 30%; }
+.dn-signature-line { border-top: 1px solid #333; margin-bottom: 4px; }
+.dn-gpay-block { font-size: 11px; text-align: center; }
+
+.dn-footer-banner {
+  margin-top: 20px;
+  background: var(--brand-red, #0056cc);
+  color: white;
+  text-align: center;
+  padding: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  page-break-inside: avoid;
+}
+
+/* Delivery note back page - the "Important Notice" terms sheet that
+   reproduces the reverse side of the paper pad. Always starts on its own
+   printed page, after the front page. */
+.dn-terms-sheet { margin-top: 24px; }
+.dn-terms-title { text-align: center; background: #dfe3f0; border: 2px solid #333; padding: 6px; font-size: 16px; margin: 0 0 12px; }
+.dn-terms-title-ta { font-size: 13px; font-weight: 400; }
+.dn-terms-list { padding-left: 20px; margin: 0; }
+.dn-terms-item { margin-bottom: 10px; font-size: 12px; line-height: 1.4; page-break-inside: avoid; }
+.dn-terms-en { color: #111; }
+.dn-terms-ta { color: #333; margin-top: 2px; }
+.dn-terms-signature-row { display: flex; justify-content: space-between; margin-top: 30px; font-size: 11px; text-align: center; page-break-inside: avoid; }
+
+@media print {
+  .dn-terms-sheet { page-break-before: always; margin-top: 0; }
+}
+
+/* Voucher print - bilingual reproduction of the blue-bordered paper voucher slip */
+.voucher-sheet { background: white; width: 148mm; min-height: 105mm; margin: 0 auto; padding: 10mm; }
+.voucher-box {
+  position: relative;
+  border: 3px solid #1a4fa0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-family: 'Noto Sans Tamil', 'Inter', sans-serif;
+  color: #111;
+  /* Without this, browsers frequently drop background/watermark images when
+     printing/saving as PDF even though the sheet itself is meant to look
+     like white paper with a faint company mark behind the text. */
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+/* Low-opacity logo watermark behind the voucher's text, matching the
+   Delivery Note pad's already-branded look. */
+.voucher-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 62%;
+  opacity: 0.16;
+  filter: grayscale(1) contrast(1.15);
+  pointer-events: none;
+  z-index: 0;
+}
+.voucher-box > *:not(.voucher-watermark) { position: relative; z-index: 1; }
+.voucher-signature-image { display: block; margin: 0 auto 2px; }
+.voucher-payment-ref { font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+/* A flex row with justify-content: space-between only centers the middle
+   badge when the "Voucher No" and "Date" text either side happen to be the
+   same width - in practice they never are (a longer voucher number pushes
+   the badge visibly off-center). A 3-column grid with equal 1fr side columns
+   keeps the badge dead-center every time, no matter how long either side's
+   text is. */
+.voucher-box-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.voucher-no { justify-self: start; }
+.voucher-date { justify-self: end; text-align: right; }
+.voucher-title-badge {
+  justify-self: center;
+  border: 2px solid #1a4fa0;
+  border-radius: 16px;
+  padding: 4px 18px;
+  text-align: center;
+  font-weight: 700;
+  color: #1a4fa0;
+}
+.voucher-title-badge-ta { font-size: 12px; font-weight: 700; }
+/* Previously a flex row with the value at `flex:1; text-align:center` -
+   that only centered the value within the leftover space after the label on
+   the same row, not across the full card, which is why it read as
+   off-center. The label is pulled out to an absolute corner instead, so the
+   value (a block spanning the full row width) centers across the whole
+   card. */
+.voucher-line { position: relative; margin-bottom: 14px; font-size: 13px; min-height: 20px; }
+.voucher-line-value { display: block; text-align: center; font-weight: 600; }
+.voucher-line-label { position: absolute; right: 0; top: 0; white-space: nowrap; }
+.voucher-line-label-fixed { position: static; display: inline; margin-right: 6px; white-space: normal; }
+.voucher-line-label-ta { font-size: 11px; color: #444; }
+.voucher-underline { border-bottom: 1px solid #333; padding: 0 4px; }
+.voucher-received-only { margin: 6px 0 14px; font-size: 13px; font-weight: 600; }
+.voucher-received-only-ta { font-size: 12px; font-weight: 400; }
+.voucher-remarks { font-size: 11px; color: #444; margin-bottom: 10px; }
+.voucher-footer-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; }
+.voucher-amount-box { border: 2px solid #1a4fa0; border-radius: 8px; padding: 6px 14px; font-weight: 700; font-size: 16px; }
+.voucher-amount-label { margin-right: 6px; }
+.voucher-signature-block { text-align: center; font-size: 11px; width: 40%; }
+.voucher-signature-line { border-top: 1px solid #333; margin-bottom: 4px; }
+.voucher-signature-ta { font-size: 10px; }
+
+@media print {
+  .voucher-sheet { padding: 6mm; width: auto; min-height: 0; }
+}
+
+/* Material Ledger print (ledger-style report) */
+.ledger-print-area { font-family: 'Inter', sans-serif; }
+.ledger-table th, .ledger-table td { font-size: 12px; }
+
+/* "Only print the purchase list": the full ledger (purchases + usage) stays
+   on screen for day-to-day reference; the print-only purchase sheet is
+   invisible on screen and is the only one shown in @media print below. */
+.print-only-ledger { display: none; }
+
+@media print {
+  .no-print, .app-sidebar, .page-header .row-actions, .toolbar, .form,
+  .m-header, .m-bottom-nav, .m-sheet-backdrop,
+  .print-toolbar { display: none !important; }
+
+  body, .print-page-wrapper { background: white; padding: 0; margin: 0; }
+  .delivery-note-sheet { border: none; width: auto; min-height: 0; margin: 0; padding: 8mm; }
+  .app-body { display: block; }
+  .app-content { padding: 0; max-width: none; }
+  .panel { border: none; padding: 0; }
+
+  .screen-only-ledger { display: none !important; }
+  .print-only-ledger { display: block !important; }
+
+  @page { size: A4; margin: 10mm; }
+}
