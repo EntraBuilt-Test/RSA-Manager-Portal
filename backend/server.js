@@ -44,10 +44,28 @@ const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
 // not cookies, so this isn't a CSRF surface.
 const MOBILE_APP_ORIGINS = ['https://localhost', 'capacitor://localhost', 'http://localhost'];
 
+// This one backend is shared by every deployed frontend (Admin Portal,
+// Manager Portal, the Android app) - see the READMEs. CLIENT_ORIGIN on
+// Render is almost always set to just ONE of them, so adding a new frontend
+// deployment silently CORS-blocks all of its writes until someone remembers
+// to append its URL to that env var too. Manager Portal hit exactly this -
+// its origin was never in CLIENT_ORIGIN, so every save from
+// rsa-manager-portal.onrender.com was being rejected before reaching a route
+// handler. Listed here as a fixed, known first-party origin (not
+// attacker-controllable) so it keeps working even if CLIENT_ORIGIN is never
+// updated on Render - CLIENT_ORIGIN should still be kept in sync for
+// clarity, this is just a safety net.
+const KNOWN_FRONTEND_ORIGINS = ['https://rsa-manager-portal.onrender.com'];
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin) || MOBILE_APP_ORIGINS.includes(origin)) {
+      if (
+        !origin ||
+        allowedOrigins.includes(origin) ||
+        MOBILE_APP_ORIGINS.includes(origin) ||
+        KNOWN_FRONTEND_ORIGINS.includes(origin)
+      ) {
         return callback(null, true);
       }
       callback(new Error('Not allowed by CORS'));
