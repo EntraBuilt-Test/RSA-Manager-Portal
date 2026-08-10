@@ -6,7 +6,7 @@ export default function StatCard({ label, value, sub, tone, icon }) {
       {icon && <div className="stat-icon">{icon}</div>}
       <div className="stat-body">
         <div className="stat-label">{label}</div>
-        <div className="stat-value">{value}</div>
+        <div className="stat-value ledger-figure">{value}</div>
         {sub && <div className="stat-sub">{sub}</div>}
       </div>
     </div>

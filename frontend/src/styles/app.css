@@ -1,31 +1,82 @@
+/* ===========================================================================
+   "SITE LEDGER" DESIGN TOKENS - identity comes from the subject itself
+   (blueprints, steel, brass fittings, poured concrete, site ledgers), not a
+   generic corporate palette. --brand-red keeps its original name for
+   backward-compat (it's referenced inline in ChatWidget.jsx's SVG and in
+   print.css's delivery-note/voucher print rules) even though the color
+   itself is no longer red - it's the blueprint-navy primary/action color now.
+
+   Typography: Fraunces for headings/section titles only (a structural serif
+   with the presence of lettering on an architectural title block - reads
+   premium/industrial rather than "generic tech sans", see .page-title etc.
+   below); Inter stays for all body/UI copy (already handles Tamil pairing);
+   IBM Plex Mono for anything that's literally a number in a ledger column
+   (see .ledger-figure below) - calmer/more "engineering document" than a
+   coder-IDE mono face.
+
+   Signature element: the active nav item gets a brass left-edge accent bar
+   instead of a solid fill (see .tab-link.active / .m-nav-item.active) - a
+   tab-index-on-a-physical-ledger motif, used in exactly that one place so it
+   stays a signature rather than becoming visual noise.
+   =========================================================================== */
 :root {
-  --brand-red: #0056cc;
-  --brand-dark: #1f2933;
-  --bg: #f4f5f7;
-  --panel-bg: #ffffff;
-  --panel-bg-alt: #f8f9fb;
-  --border: #d9dde3;
-  --text: #1f2933;
-  --text-muted: #6b7280;
-  --green: #1b8a4c;
-  --amber: #b8860b;
-  --danger: #c1272d;
-  --sidebar-bg: #1f2933;
-  --sidebar-text: #cbd2d9;
-  --overlay: rgba(0, 0, 0, 0.4);
+  --brand-red: #16324F;      /* blueprint navy - primary actions, active nav, links */
+  --brand-dark: #1B2430;     /* structural graphite */
+  --accent: #B8863D;         /* brass/copper - signature accent, used SPARINGLY */
+  --bg: #F5F2EA;             /* warm poured-concrete ivory, not sterile white */
+  --panel-bg: #FFFFFF;
+  --panel-bg-alt: #EFEBE0;
+  --border: #DDD6C4;
+  --text: #1B2430;           /* graphite */
+  --text-muted: #6B6558;     /* warm neutral, not cool gray */
+  --green: #2E7A4F;          /* rebar green - paid/balanced states */
+  --amber: #B8863D;          /* brass reused as the amber/warning tone - keeps the palette tight */
+  --danger: #A83A2E;         /* oxide rust red - stays warm, not a generic bright red */
+  --sidebar-bg: #1B2430;     /* structural graphite/steel */
+  --sidebar-text: #C9C2AE;
+  --overlay: rgba(27, 36, 48, 0.45);
+  --font-heading: 'Fraunces', 'Noto Sans Tamil', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', 'Noto Sans Tamil', 'Courier New', monospace;
   font-family: 'Inter', 'Noto Sans Tamil', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 [data-theme='dark'] {
-  --bg: #14181d;
-  --panel-bg: #1c2128;
-  --panel-bg-alt: #232a33;
-  --border: #333c47;
-  --text: #e6e9ee;
-  --text-muted: #94a0b1;
-  --sidebar-bg: #0f1317;
-  --sidebar-text: #b7c0cc;
+  /* Same navy/brass relationship, surfaces inverted. --brand-red is
+     brightened for dark mode specifically - the light-mode navy value is
+     nearly invisible as a button fill against a charcoal panel, so it can't
+     just be reused as-is; brass glows a little warmer/brighter here too,
+     which is intentional. */
+  --brand-red: #3D6690;
+  --brand-dark: #C9C2AE;
+  --accent: #C99A4E;
+  --bg: #12161C;
+  --panel-bg: #1B2430;
+  --panel-bg-alt: #212B38;
+  --border: #333E4D;
+  --text: #EDE8DA;
+  --text-muted: #A79E8C;
+  --green: #3F9B69;
+  --amber: #C99A4E;
+  --danger: #C2503F;
+  --sidebar-bg: #0D1116;
+  --sidebar-text: #C9C2AE;
   --overlay: rgba(0, 0, 0, 0.6);
+}
+
+/* ---- Ledger figures: monospace treatment for anything that's literally a
+   number in a ledger column (StatCard values, table amount/count columns,
+   balances) - the one detail that makes this read as a real site ledger
+   instead of a generic admin table. Applied both as a standalone utility
+   class (.ledger-figure, used on table cells in Dashboard.jsx/LabourPage.jsx)
+   and directly on the handful of components that are ALWAYS numeric. ---- */
+.ledger-figure,
+.stat-value,
+.m-card-amount,
+.amount-cell,
+.total-amount {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
 }
 
 * { box-sizing: border-box; }
@@ -73,8 +124,8 @@ body {
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
-.brand-title { font-weight: 700; font-size: 15px; color: var(--brand-red); letter-spacing: 0.2px; white-space: nowrap; }
-.brand-sub { font-size: 11px; color: #9aa5b3; margin-top: 2px; }
+.brand-title { font-family: var(--font-heading); font-weight: 700; font-size: 15px; color: #fff; letter-spacing: 0.2px; white-space: nowrap; }
+.brand-sub { font-size: 11px; color: rgba(201, 194, 174, 0.7); margin-top: 2px; }
 
 .collapse-toggle-btn {
   flex-shrink: 0;
@@ -96,22 +147,38 @@ body {
 .collapse-toggle-btn:focus-visible { outline: 2px solid var(--brand-red); outline-offset: 2px; }
 
 .tab-nav { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+/* Signature element: the active tab gets a brass left-edge accent bar
+   instead of a solid fill - reads like a tab index on a physical ledger/
+   binder. border-left is reserved (transparent) on every state so switching
+   active/inactive never shifts the label's horizontal position. */
 .tab-link {
   color: var(--sidebar-text);
   text-decoration: none;
-  padding: 10px 12px;
-  border-radius: 7px;
+  padding: 10px 12px 10px 9px;
+  border-left: 3px solid transparent;
+  border-radius: 0 7px 7px 0;
   font-size: 13px;
   font-weight: 500;
   background: transparent;
-  border: none;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
   cursor: pointer;
   text-align: left;
   width: 100%;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
-.tab-link:hover { background: rgba(255, 255, 255, 0.08); color: white; }
-.tab-link.active { background: var(--brand-red); color: white; }
-.tab-link:focus-visible { outline: 2px solid var(--brand-red); outline-offset: -2px; }
+.tab-link:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.tab-link.active {
+  background: rgba(184, 134, 61, 0.14);
+  border-left-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.tab-link:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+@media (prefers-reduced-motion: reduce) {
+  .tab-link { transition: none; }
+}
 
 .sidebar-footer { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 14px; }
 .sidebar-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
@@ -192,8 +259,9 @@ body {
 .m-header-title {
   flex: 1;
   text-align: center;
-  font-size: 16px;
-  font-weight: 700;
+  font-family: var(--font-heading);
+  font-size: 17px;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -266,6 +334,7 @@ body {
   min-height: 56px;
   background: none;
   border: none;
+  border-top: 2px solid transparent; /* reserved on every state - see .tab-link's matching left-edge accent */
   color: var(--text-muted);
   text-decoration: none;
   font-size: 10.5px;
@@ -274,7 +343,10 @@ body {
   cursor: pointer;
 }
 .m-nav-item svg { width: 22px; height: 22px; }
-.m-nav-item.active { color: var(--brand-red); }
+/* Same "brass tab-index" signature as the desktop sidebar's active accent,
+   rotated to the item's top edge to match the bottom nav's horizontal
+   layout. */
+.m-nav-item.active { color: var(--brand-red); border-top-color: var(--accent); }
 
 /* "More" bottom sheet - remaining nav tabs + theme/language/logout, in place
    of squeezing the whole desktop sidebar's contents onto a phone screen. */
@@ -307,7 +379,8 @@ body {
 .m-sheet-user-icon { width: 30px; height: 30px; color: var(--brand-red); flex-shrink: 0; }
 .m-sheet-links { display: flex; flex-direction: column; gap: 2px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 6px 0; margin-bottom: 14px; }
 .m-sheet-link {
-  padding: 13px 6px;
+  padding: 13px 6px 13px 9px;
+  border-left: 3px solid transparent;
   min-height: 44px;
   display: flex;
   align-items: center;
@@ -315,9 +388,9 @@ body {
   text-decoration: none;
   font-size: 14.5px;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: 0 8px 8px 0;
 }
-.m-sheet-link.active { color: var(--brand-red); background: rgba(0, 86, 204, 0.08); }
+.m-sheet-link.active { color: var(--brand-red); background: rgba(184, 134, 61, 0.1); border-left-color: var(--accent); }
 .m-sheet-controls { display: flex; gap: 10px; margin-bottom: 14px; }
 .m-sheet-controls .btn { flex: 1; min-height: 44px; justify-content: center; }
 .m-sheet-controls .lang-select { flex: 1; background: var(--panel-bg-alt); color: var(--text); border: 1px solid var(--border); }
@@ -347,7 +420,7 @@ body {
 .m-card-row-sub { font-size: 12.5px; color: var(--text-muted); }
 .m-card-amount { font-size: 16px; font-weight: 700; color: var(--brand-red); margin-top: 4px; }
 
-.page-title { font-size: 22px; margin: 0 0 16px; }
+.page-title { font-family: var(--font-heading); font-weight: 600; font-size: 23px; margin: 0 0 16px; color: var(--text); }
 .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
 .page-loading { padding: 40px; text-align: center; color: var(--text-muted); }
 
@@ -361,24 +434,26 @@ body {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 .panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.panel h2 { font-size: 15px; margin: 0 0 12px; font-weight: 700; letter-spacing: 0.2px; }
+.panel h2 { font-family: var(--font-heading); font-size: 16px; margin: 0 0 12px; font-weight: 600; letter-spacing: 0.1px; }
 
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
 .stat-card {
   background: var(--panel-bg);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 16px;
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  /* Graphite-tinted shadow instead of pure black - warmer, less "generic
+     SaaS card" than a neutral-gray drop shadow. */
+  box-shadow: 0 1px 2px rgba(27, 36, 48, 0.06), 0 1px 1px rgba(27, 36, 48, 0.04);
   transition: box-shadow 0.15s ease, transform 0.15s ease;
   box-sizing: border-box;
   min-width: 0;
   overflow: hidden;
 }
-.stat-card:hover { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); transform: translateY(-1px); }
+.stat-card:hover { box-shadow: 0 8px 20px rgba(27, 36, 48, 0.12); transform: translateY(-1px); }
 .stat-icon {
   flex-shrink: 0;
   width: 38px;
@@ -395,13 +470,13 @@ body {
 .stat-value { font-size: clamp(16px, 2.2vw, 22px); font-weight: 700; overflow-wrap: break-word; min-width: 0; }
 .stat-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 .stat-brand .stat-value { color: var(--brand-red); }
-.stat-brand .stat-icon { background: rgba(0, 86, 204, 0.1); }
+.stat-brand .stat-icon { background: rgba(22, 50, 79, 0.1); }
 .stat-warn .stat-value { color: var(--amber); }
-.stat-warn .stat-icon { background: rgba(184, 134, 11, 0.12); color: var(--amber); }
+.stat-warn .stat-icon { background: rgba(184, 134, 61, 0.14); color: var(--amber); }
 .stat-danger .stat-value { color: var(--danger); }
-.stat-danger .stat-icon { background: rgba(193, 39, 45, 0.1); color: var(--danger); }
+.stat-danger .stat-icon { background: rgba(168, 58, 46, 0.1); color: var(--danger); }
 .stat-ok .stat-value { color: var(--green); }
-.stat-ok .stat-icon { background: rgba(27, 138, 76, 0.1); color: var(--green); }
+.stat-ok .stat-icon { background: rgba(46, 122, 79, 0.1); color: var(--green); }
 
 /* ---- Animated dashboard entrance (FR "advance dashboard in animating way")
    Cards fade + rise in on load, staggered one after another so the eye is
@@ -415,9 +490,9 @@ body {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes statIconPulse {
-  0% { box-shadow: 0 0 0 0 rgba(0, 86, 204, 0.28); }
-  70% { box-shadow: 0 0 0 8px rgba(0, 86, 204, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 86, 204, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(22, 50, 79, 0.28); }
+  70% { box-shadow: 0 0 0 8px rgba(22, 50, 79, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(22, 50, 79, 0); }
 }
 .stat-card {
   animation: statCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -452,7 +527,7 @@ body {
   transform-origin: bottom;
   animation: barGrow 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
 }
-.chart-bar:hover { fill: #004bb3; }
+.chart-bar:hover { fill: #0F2338; }
 @keyframes barGrow {
   from { transform: scaleY(0); }
   to { transform: scaleY(1); }
@@ -475,10 +550,26 @@ body {
 
 .data-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 480px; }
 .data-table th, .data-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); text-align: left; }
-.data-table thead th { background: var(--panel-bg-alt); font-weight: 600; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+/* Structural graphite header row (matches the sidebar), not a plain gray
+   band - reads like a ledger's fixed printed header rather than a generic
+   admin table. */
+.data-table thead th {
+  background: var(--sidebar-bg);
+  font-weight: 600;
+  color: var(--sidebar-text);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.data-table thead tr:first-child th:first-child { border-top-left-radius: 6px; }
+.data-table thead tr:first-child th:last-child { border-top-right-radius: 6px; }
 .data-table tfoot td { font-weight: 700; }
+/* Warm zebra striping (ledger-ruled-paper feel) - guarded off row-low-stock
+   so an inactive-worker/low-stock row's own tint always wins regardless of
+   its position in the table. */
+.data-table tbody tr:nth-child(even):not(.row-low-stock) { background: var(--panel-bg-alt); }
 .empty-row { text-align: center; color: var(--text-muted); padding: 24px; }
-.row-low-stock { background: rgba(193, 39, 45, 0.08); }
+.row-low-stock { background: rgba(168, 58, 46, 0.08); }
 .txn-in { color: var(--green); font-weight: 600; }
 .txn-out { color: var(--danger); font-weight: 600; }
 
@@ -500,19 +591,26 @@ body {
 .danger-text { color: var(--danger); font-weight: 600; }
 
 .badge { padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
-.badge-paid { background: rgba(27, 138, 76, 0.15); color: var(--green); }
-.badge-pending { background: rgba(193, 39, 45, 0.12); color: var(--danger); }
+.badge-paid { background: rgba(46, 122, 79, 0.15); color: var(--green); }
+.badge-pending { background: rgba(168, 58, 46, 0.12); color: var(--danger); }
 .badge-btn { background: none; border: none; cursor: pointer; padding: 0; }
 
 .btn { border: none; border-radius: 7px; padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; transition: background-color 0.15s ease, filter 0.15s ease, transform 0.1s ease; }
 .btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--brand-red); color: white; box-shadow: 0 2px 6px rgba(0, 86, 204, 0.25); }
-.btn-primary:hover { background: #004bb3; }
+.btn-primary { background: var(--brand-red); color: white; box-shadow: 0 2px 6px rgba(22, 50, 79, 0.3); }
+.btn-primary:hover { background: #102A44; }
 .btn-ghost { background: var(--panel-bg-alt); color: var(--text); }
 .btn-ghost:hover { filter: brightness(0.95); }
-.btn-danger { background: rgba(193, 39, 45, 0.12); color: var(--danger); }
+.btn-danger { background: rgba(168, 58, 46, 0.12); color: var(--danger); }
 .btn-sm { padding: 5px 10px; font-size: 12px; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+/* Visible keyboard focus state, brass-tinted per the brand accent - kept
+   deliberately simple (outline, not a fancy box-shadow ring) so it stays
+   robust across browsers and is never accidentally suppressed for style. */
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition: none; }
+}
 
 .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
 .toolbar input, .toolbar select { padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background: var(--panel-bg); color: var(--text); }
@@ -773,7 +871,7 @@ body {
 .particulars-grand-total span:last-child { color: var(--brand-red); }
 
 .alert { padding: 12px 14px; border-radius: 8px; font-size: 13px; margin-bottom: 14px; }
-.alert-error { background: rgba(193, 39, 45, 0.1); color: var(--danger); border: 1px solid rgba(193, 39, 45, 0.3); }
+.alert-error { background: rgba(168, 58, 46, 0.1); color: var(--danger); border: 1px solid rgba(168, 58, 46, 0.3); }
 
 .modal-overlay { position: fixed; inset: 0; background: var(--overlay); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
 .modal-box { background: var(--panel-bg); color: var(--text); border-radius: 10px; padding: 20px; width: 340px; max-width: 100%; }
@@ -786,8 +884,8 @@ body {
   justify-content: center;
   padding: 16px;
   background-image: linear-gradient(
-      rgba(15, 23, 42, 0.45), 
-      rgba(15, 23, 42, 0.45)
+      rgba(27, 36, 48, 0.55),
+      rgba(27, 36, 48, 0.55)
     ),
     url('../logo/Steel_and_glass_building_frame_202607311753 - Edited.jpg');
   background-size: cover;
@@ -811,8 +909,8 @@ body {
 [data-theme='dark'] .login-card {
   background: rgba(20, 24, 29, 0.32);
 }
-.login-brand-mark { width: 56px; height: 56px; color: var(--brand-red); align-self: center; margin: 4px 0; }
-.login-card h1 { color: #60a5fa; font-size: 20px; margin: 0; text-align: center; }
+.login-brand-mark { width: 56px; height: 56px; color: var(--accent); align-self: center; margin: 4px 0; }
+.login-card h1 { font-family: var(--font-heading); font-weight: 600; color: #D9B673; font-size: 21px; margin: 0; text-align: center; }
 .login-sub { text-align: center; color: rgba(255, 255, 255, 0.7); font-size: 12px; margin: 0 0 10px; }
 .login-card label { font-size: 12px; font-weight: 600; color: rgba(255, 255, 255, 0.8) !important; }
 .login-card input { padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--panel-bg); color: var(--text); }
@@ -822,7 +920,7 @@ body {
 .report-tabs .tab-link { background: var(--panel-bg-alt); color: var(--text); width: auto; }
 .report-tabs .tab-link.active { background: var(--brand-red); color: white; }
 
-.ledger-title { text-align: center; font-size: 16px; }
+.ledger-title { font-family: var(--font-heading); font-weight: 600; text-align: center; font-size: 17px; }
 
 /* ---- Tablet (768-1023px): DesktopShell's sidebar stays a normal static
    column (this is NOT the phone breakpoint - phones under 768px never mount
@@ -923,7 +1021,7 @@ body {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
   transition: transform 0.15s ease, background 0.15s ease;
 }
-.chat-fab:hover { transform: scale(1.06); background: #a41f24; }
+.chat-fab:hover { transform: scale(1.06); background: #102A44; }
 .chat-fab-close { font-size: 26px; line-height: 1; }
 .chat-panel {
   width: 320px;
@@ -975,8 +1073,11 @@ body {
 }
 .chat-mic-btn-listening { background: var(--brand-red); border-color: var(--brand-red); animation: chat-mic-pulse 1.2s ease-in-out infinite; }
 @keyframes chat-mic-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(196, 34, 41, 0.5); }
-  50% { box-shadow: 0 0 0 6px rgba(196, 34, 41, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(22, 50, 79, 0.5); }
+  50% { box-shadow: 0 0 0 6px rgba(22, 50, 79, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-mic-btn-listening { animation: none; }
 }
 
 @media (max-width: 480px) {

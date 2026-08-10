@@ -472,13 +472,13 @@ function DailyEntryTab({ workers, loadingWorkers, sites, onPosted, t }) {
                 <tr key={e._id}>
                   <td>{e.site}</td>
                   <td>{e.workerName}</td>
-                  <td>{workerCountFor(e)}</td>
-                  <td>{formatCurrency(e.wageEarned)}</td>
-                  <td>{formatCurrency(e.balanceBefore || 0)}</td>
-                  <td>{formatCurrency(e.totalDue || e.wageEarned)}</td>
-                  <td>{formatCurrency(e.paid)}</td>
-                  <td>{formatCurrency(e.balanceAfter)}</td>
-                  <td>{formatCurrency(e.advance)}</td>
+                  <td className="ledger-figure">{workerCountFor(e)}</td>
+                  <td className="ledger-figure">{formatCurrency(e.wageEarned)}</td>
+                  <td className="ledger-figure">{formatCurrency(e.balanceBefore || 0)}</td>
+                  <td className="ledger-figure">{formatCurrency(e.totalDue || e.wageEarned)}</td>
+                  <td className="ledger-figure">{formatCurrency(e.paid)}</td>
+                  <td className="ledger-figure">{formatCurrency(e.balanceAfter)}</td>
+                  <td className="ledger-figure">{formatCurrency(e.advance)}</td>
                 </tr>
               ))}
               {recentEntries.length === 0 && (
@@ -623,10 +623,10 @@ function WorkersTab({ workers, loadingWorkers, workersError, sites, roles, onCha
                   <td>{w.name}</td>
                   <td>{w.site}</td>
                   <td>{w.role}</td>
-                  <td>{formatCurrency(w.dailyWage)}</td>
-                  <td>{formatCurrency(w.totalAdvance || 0)}</td>
-                  <td>{formatCurrency(w.totalPaid || 0)}</td>
-                  <td className={w.currentBalance > 0 ? 'danger-text' : ''}>{formatCurrency(w.currentBalance)}</td>
+                  <td className="ledger-figure">{formatCurrency(w.dailyWage)}</td>
+                  <td className="ledger-figure">{formatCurrency(w.totalAdvance || 0)}</td>
+                  <td className="ledger-figure">{formatCurrency(w.totalPaid || 0)}</td>
+                  <td className={`ledger-figure${w.currentBalance > 0 ? ' danger-text' : ''}`}>{formatCurrency(w.currentBalance)}</td>
                   <td>
                     <button type="button" className="btn btn-ghost btn-sm" onClick={() => toggleActive(w)}>
                       {w.active ? '✓' : '—'}
@@ -751,11 +751,11 @@ function SiteSheetTab({ sites, t }) {
                 <tr key={e._id}>
                   <td data-label={t('labour.date')}>{formatDate(e.date)}</td>
                   <td data-label={t('labour.workerName')}>{e.workerName}</td>
-                  <td data-label={t('labour.daysWorked')}>{e.daysWorked}</td>
-                  <td data-label={t('labour.wageEarned')}>{formatCurrency(e.wageEarned)}</td>
-                  <td data-label={t('labour.advance')}>{formatCurrency(e.advance)}</td>
-                  <td data-label={t('labour.paid')}>{formatCurrency(e.paid)}</td>
-                  <td data-label={t('labour.currentBalance')}>{formatCurrency(e.balanceAfter)}</td>
+                  <td className="ledger-figure" data-label={t('labour.daysWorked')}>{e.daysWorked}</td>
+                  <td className="ledger-figure" data-label={t('labour.wageEarned')}>{formatCurrency(e.wageEarned)}</td>
+                  <td className="ledger-figure" data-label={t('labour.advance')}>{formatCurrency(e.advance)}</td>
+                  <td className="ledger-figure" data-label={t('labour.paid')}>{formatCurrency(e.paid)}</td>
+                  <td className="ledger-figure" data-label={t('labour.currentBalance')}>{formatCurrency(e.balanceAfter)}</td>
                 </tr>
               ))}
               {sheet.entries.length === 0 && (
@@ -794,8 +794,8 @@ function SiteSheetTab({ sites, t }) {
                 <tr key={w._id}>
                   <td data-label={t('labour.workerName')}>{w.name}</td>
                   <td data-label={t('labour.role')}>{w.role}</td>
-                  <td data-label={t('labour.dailyWage')}>{formatCurrency(w.dailyWage)}</td>
-                  <td className={w.currentBalance > 0 ? 'danger-text' : ''} data-label={t('labour.currentBalance')}>{formatCurrency(w.currentBalance)}</td>
+                  <td className="ledger-figure" data-label={t('labour.dailyWage')}>{formatCurrency(w.dailyWage)}</td>
+                  <td className={`ledger-figure${w.currentBalance > 0 ? ' danger-text' : ''}`} data-label={t('labour.currentBalance')}>{formatCurrency(w.currentBalance)}</td>
                 </tr>
               ))}
             </tbody>
@@ -904,11 +904,11 @@ function ConsolidatedTab({ t }) {
               {data?.rows.map((r) => (
                 <tr key={r.site}>
                   <td data-label={t('labour.site')}>{r.site}</td>
-                  <td data-label={t('labour.workerCount')}>{r.workerCount}</td>
-                  <td data-label={t('labour.totalWages')}>{formatCurrency(r.wageEarned)}</td>
-                  <td data-label={t('labour.totalAdvance')}>{formatCurrency(r.advance)}</td>
-                  <td data-label={t('labour.totalPaid')}>{formatCurrency(r.paid)}</td>
-                  <td className={r.balanceDue > 0 ? 'danger-text' : ''} data-label={t('labour.totalBalanceDue')}>{formatCurrency(r.balanceDue)}</td>
+                  <td className="ledger-figure" data-label={t('labour.workerCount')}>{r.workerCount}</td>
+                  <td className="ledger-figure" data-label={t('labour.totalWages')}>{formatCurrency(r.wageEarned)}</td>
+                  <td className="ledger-figure" data-label={t('labour.totalAdvance')}>{formatCurrency(r.advance)}</td>
+                  <td className="ledger-figure" data-label={t('labour.totalPaid')}>{formatCurrency(r.paid)}</td>
+                  <td className={`ledger-figure${r.balanceDue > 0 ? ' danger-text' : ''}`} data-label={t('labour.totalBalanceDue')}>{formatCurrency(r.balanceDue)}</td>
                 </tr>
               ))}
               {(!data || data.rows.length === 0) && (
@@ -1023,8 +1023,8 @@ function MonthlySalaryTab({ t }) {
                   <td>{r.workerName}</td>
                   <td>{r.site}</td>
                   <td>{r.role}</td>
-                  <td>{r.daysWorked}</td>
-                  <td>{formatCurrency(r.wageEarned)}</td>
+                  <td className="ledger-figure">{r.daysWorked}</td>
+                  <td className="ledger-figure">{formatCurrency(r.wageEarned)}</td>
                 </tr>
               ))}
               {(!data || data.rows.length === 0) && (

@@ -183,11 +183,11 @@ export default function Dashboard() {
                   <td>{formatDate(e.date)}</td>
                   <td>{e.workerName}</td>
                   <td>{e.site}</td>
-                  <td>{e.daysWorked}</td>
-                  <td>{formatCurrency(e.wageEarned)}</td>
-                  <td>{formatCurrency(e.advance)}</td>
-                  <td>{formatCurrency(e.paid)}</td>
-                  <td>{formatCurrency(e.balanceAfter)}</td>
+                  <td className="ledger-figure">{e.daysWorked}</td>
+                  <td className="ledger-figure">{formatCurrency(e.wageEarned)}</td>
+                  <td className="ledger-figure">{formatCurrency(e.advance)}</td>
+                  <td className="ledger-figure">{formatCurrency(e.paid)}</td>
+                  <td className="ledger-figure">{formatCurrency(e.balanceAfter)}</td>
                 </tr>
               ))}
               {recentEntries.length === 0 && (
