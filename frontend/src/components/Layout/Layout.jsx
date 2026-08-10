@@ -35,8 +35,6 @@ function useTabs(t) {
 
 const HIDDEN_FROM_SIDEBAR = ['Outsourcing Material', 'Client Material'];
 const COLLAPSE_STORAGE_KEY = 'rsa-sidebar-collapsed';
-const LOGO_CLICKS_TO_UNLOCK = 5;
-const LOGO_CLICK_WINDOW_MS = 1500;
 
 // Every built-in tab gets its own bottom-nav icon on a phone; the bar itself
 // scrolls horizontally so all of them (plus any Superadmin-created tab) fit
@@ -90,30 +88,6 @@ export default function Layout() {
   }, []);
   const allTabs = [...tabs, ...customTabs];
 
-  // Hidden Superadmin entrance: 5 clicks on the brand/logo within 1.5s opens
-  // /superadmin. Only wired up at all for isSuperAdmin users - for everyone
-  // else the clicks are silently ignored, so the feature isn't discoverable.
-  const logoClickCount = useRef(0);
-  const logoClickTimer = useRef(null);
-  const handleLogoClick = () => {
-    if (!user?.isSuperAdmin) return;
-    logoClickCount.current += 1;
-    if (logoClickTimer.current) clearTimeout(logoClickTimer.current);
-    if (logoClickCount.current >= LOGO_CLICKS_TO_UNLOCK) {
-      logoClickCount.current = 0;
-      navigate('/superadmin');
-      return;
-    }
-    logoClickTimer.current = setTimeout(() => {
-      logoClickCount.current = 0;
-    }, LOGO_CLICK_WINDOW_MS);
-  };
-  useEffect(() => {
-    return () => {
-      if (logoClickTimer.current) clearTimeout(logoClickTimer.current);
-    };
-  }, []);
-
   if (isMobile) {
     return (
       <MobileShell
@@ -141,7 +115,6 @@ export default function Layout() {
       setLanguage={setLanguage}
       t={t}
       allTabs={allTabs}
-      onLogoClick={handleLogoClick}
     />
   );
 }
@@ -152,7 +125,7 @@ export default function Layout() {
    drawer/hamburger logic is needed any more - that behavior now belongs to
    MobileShell below, purpose-built for a phone instead of a shrunk sidebar.
    =========================================================================== */
-function DesktopShell({ user, logout, theme, toggleTheme, language, setLanguage, t, allTabs, onLogoClick }) {
+function DesktopShell({ user, logout, theme, toggleTheme, language, setLanguage, t, allTabs }) {
   const [collapsed, setCollapsed] = useState(() => {
     try {
       return localStorage.getItem(COLLAPSE_STORAGE_KEY) === '1';
@@ -194,8 +167,7 @@ function DesktopShell({ user, logout, theme, toggleTheme, language, setLanguage,
           <div className="sidebar-top-row">
             <div
               className="brand"
-              onClick={onLogoClick}
-              style={{ cursor: user?.isSuperAdmin ? 'pointer' : 'default', display: 'flex', flexDirection: 'column', alignItems: collapsed ? 'center' : 'flex-start', gap: '4px' }}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: collapsed ? 'center' : 'flex-start', gap: '4px' }}
             >
               <div style={{ width: collapsed ? '52px' : '82px', height: collapsed ? '24px' : '37px', overflow: 'hidden', position: 'relative' }}>
                 <img
