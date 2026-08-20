@@ -31,4 +31,55 @@ function uploadBufferToCloudinary(buffer, folder, options = {}) {
   });
 }
 
-module.exports = { cloudinary, isCloudinaryConfigured, uploadBufferToCloudinary };
+/**
+ * Item U: Site Progress Photos was a dead screen on any deployment where the
+ * three CLOUDINARY_* variables were not set - it refused the upload outright
+ * with a setup error, so the feature simply did not work for the client.
+ *
+ * Cloudinary is still the right primary store (Render's disk is ephemeral),
+ * but a missing key should not stop a foreman on site from saving today's
+ * photos. When Cloudinary is not configured - or the upload to it fails - the
+ * image is written under backend/uploads/ and served from /uploads, so the
+ * feature degrades instead of breaking. The response shape is identical
+ * either way, so callers do not care which path was taken.
+ */
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+
+const LOCAL_ROOT = path.join(__dirname, '..', 'uploads');
+
+function storeLocally(buffer, folder, originalName = '') {
+  const dir = path.join(LOCAL_ROOT, folder);
+  fs.mkdirSync(dir, { recursive: true });
+  const ext = (path.extname(originalName) || '.jpg').toLowerCase();
+  const id = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${ext}`;
+  fs.writeFileSync(path.join(dir, id), buffer);
+  const rel = `${folder}/${id}`.replace(/\\/g, '/');
+  return {
+    secure_url: `/uploads/${rel}`,
+    public_id: `local:${rel}`,
+    storage: 'local',
+  };
+}
+
+/**
+ * Stores an image buffer and returns { secure_url, public_id, storage }.
+ * Prefers Cloudinary, falls back to local disk. Never throws for a missing
+ * Cloudinary configuration.
+ */
+async function storeImageBuffer(buffer, folder, options = {}, originalName = '') {
+  if (isCloudinaryConfigured()) {
+    try {
+      const result = await uploadBufferToCloudinary(buffer, folder, options);
+      return { ...result, storage: 'cloudinary' };
+    } catch (err) {
+      // Network blip, quota, bad key - still better to keep the photo than
+      // to lose the site visit.
+      console.warn('[storeImageBuffer] Cloudinary upload failed, falling back to local disk:', err.message);
+    }
+  }
+  return storeLocally(buffer, folder, originalName);
+}
+
+module.exports = { cloudinary, isCloudinaryConfigured, uploadBufferToCloudinary, storeImageBuffer, LOCAL_ROOT };

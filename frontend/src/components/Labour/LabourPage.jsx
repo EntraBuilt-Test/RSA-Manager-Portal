@@ -6,6 +6,7 @@ import { formatCurrency, formatDate } from '../../utils/format.js';
 import { useLanguage } from '../../context/LanguageContext.jsx';
 import BackButton from '../common/BackButton.jsx';
 import LoadingState from '../common/LoadingState.jsx';
+import SelectField from '../common/SelectField.jsx';
 import DateField from '../common/DateField.jsx';
 
 const TABS = [
@@ -507,6 +508,125 @@ function DailyEntryTab({ workers, loadingWorkers, sites, onPosted, t }) {
   );
 }
 
+const HELPER_ROLE = 'Helper';
+
+/** Item S / Z: identical to the Admin portal's Helper panel. */
+function HelperPanel({ workers, sites, onChange, t }) {
+  const [name, setName] = useState('');
+  const [site, setSite] = useState('');
+  const [dailyWage, setDailyWage] = useState('');
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const helpers = (workers || []).filter((w) => (w.role || '').toLowerCase().includes('helper'));
+
+  const addHelper = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!name.trim()) return;
+    setSaving(true);
+    try {
+      await workerApi.create({
+        name: name.trim(),
+        site,
+        role: HELPER_ROLE,
+        dailyWage: Number(dailyWage) || 0,
+        whatsappNumber,
+      });
+      setName('');
+      setSite('');
+      setDailyWage('');
+      setWhatsappNumber('');
+      onChange();
+    } catch (err) {
+      setError(err.response?.data?.message || t('labour.errorSave'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <form className="panel form" onSubmit={addHelper}>
+        <h2>{t('labour.addHelper')}</h2>
+        {error && <div className="alert alert-error">{error}</div>}
+        <div className="form-grid">
+          <div className="form-field">
+            <label htmlFor="helper-name">{t('labour.helperName')}</label>
+            <input id="helper-name" value={name} onChange={(e) => setName(e.target.value)} required />
+          </div>
+          <div className="form-field">
+            <label htmlFor="helper-site">{t('labour.site')}</label>
+            <SelectField
+              id="helper-site"
+              searchable
+              allowCustom
+              value={site}
+              onChange={(e) => setSite(e.target.value)}
+              options={sites.map((s) => ({ value: s, label: s }))}
+            />
+          </div>
+          <div className="form-field">
+            <label htmlFor="helper-wage">{t('labour.dailyWage')}</label>
+            <input
+              id="helper-wage"
+              type="number"
+              min="0"
+              step="0.01"
+              value={dailyWage}
+              onChange={(e) => setDailyWage(e.target.value)}
+            />
+          </div>
+          <div className="form-field">
+            <label htmlFor="helper-whatsapp">WhatsApp Number</label>
+            <input
+              id="helper-whatsapp"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              placeholder="9876543210"
+            />
+          </div>
+        </div>
+        <div className="form-actions">
+          <button type="submit" className="btn btn-primary" disabled={saving}>
+            {saving ? t('labour.saving') : t('labour.addHelper')}
+          </button>
+        </div>
+      </form>
+
+      <div className="panel">
+        <h2>{t('labour.helpers')}</h2>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>{t('labour.helperName')}</th>
+              <th>{t('labour.site')}</th>
+              <th>{t('labour.dailyWage')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {helpers.map((h) => (
+              <tr key={h._id}>
+                <td>{h.name}</td>
+                <td>{h.site}</td>
+                <td>{formatCurrency(h.dailyWage || 0)}</td>
+              </tr>
+            ))}
+            {helpers.length === 0 && (
+              <tr>
+                <td colSpan={3} className="empty-row">
+                  {t('labour.noHelpers')}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </>
+  );
+}
+
 function WorkersTab({ workers, loadingWorkers, workersError, sites, roles, onChange, t }) {
   const [name, setName] = useState('');
   const [site, setSite] = useState('');
@@ -561,24 +681,26 @@ function WorkersTab({ workers, loadingWorkers, workersError, sites, roles, onCha
             <input value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div className="form-field">
-            <label>{t('labour.site')}</label>
-            <input value={site} onChange={(e) => setSite(e.target.value)} list="labour-site-options" />
-            <datalist id="labour-site-options">
-              {sites.map((s) => (
-                <option key={s} value={s} />
-              ))}
-            </datalist>
+            <label htmlFor="worker-site">{t('labour.site')}</label>
+            <SelectField
+              id="worker-site"
+              searchable
+              allowCustom
+              value={site}
+              onChange={(e) => setSite(e.target.value)}
+              options={sites.map((s) => ({ value: s, label: s }))}
+            />
           </div>
           <div className="form-field">
-            <label>{t('labour.role')}</label>
-            <select value={role} onChange={(e) => setRole(e.target.value)}>
-              <option value="">--</option>
-              {roles.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
+            <label htmlFor="worker-role">{t('labour.role')}</label>
+            <SelectField
+              id="worker-role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              allowClear
+              clearLabel="Clear"
+              options={roles.map((r) => ({ value: r, label: r }))}
+            />
           </div>
           <div className="form-field">
             <label>{t('labour.dailyWage')}</label>
@@ -599,6 +721,9 @@ function WorkersTab({ workers, loadingWorkers, workersError, sites, roles, onCha
           </button>
         </div>
       </form>
+
+      {/* Item S: same Helper panel as the Admin portal (item Z: parity). */}
+      <HelperPanel workers={workers} sites={sites} onChange={onChange} t={t} />
 
       <div className="panel">
         <h2>{t('labour.tabWorkers')}</h2>

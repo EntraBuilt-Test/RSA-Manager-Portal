@@ -1098,3 +1098,225 @@ body {
 .mobile-shell:has(.m-bottom-nav-hidden) .chat-widget {
   bottom: calc(14px + env(safe-area-inset-bottom, 0px));
 }
+
+
+/* ============================================================
+   CLIENT CHANGE BATCH - 20 Aug 2026
+   Items C/D/E/F/M/N/R/W/Y. Everything below uses the theme
+   tokens at the top of this file, never a literal colour, so
+   the dark toggle flips it along with the rest of the app.
+   ============================================================ */
+
+/* --- Item M: the real cause of the black-on-black panels ---
+   Browsers render native form controls (and any element that does not inherit
+   colour, e.g. a <button> with `background: none`) using the OS colour scheme
+   unless the page declares its own. That is why the Advance/Balance cell went
+   to a black block in dark mode while everything around it flipped correctly.
+   Declaring color-scheme per theme makes every native control - selects,
+   scrollbars, date popups, autofill - follow the app's theme. */
+:root { color-scheme: light; }
+[data-theme='dark'] { color-scheme: dark; }
+
+/* Buttons do not inherit colour by default; this is the Advance/Balance
+   "received / due" control from the billing list. */
+.badge-btn { color: inherit; background: none; border: none; cursor: pointer; padding: 0; }
+.badge-btn:hover { text-decoration: underline; }
+
+/* --- Item E + D: every date field is a real, obviously clickable box --- */
+.date-field { position: relative; width: 100%; }
+.date-field-box {
+  width: 100%;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-bg);
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.date-field-box:hover:not(:disabled) { border-color: var(--brand-red); }
+.date-field-box:focus-visible { outline: 2px solid var(--brand-red); outline-offset: 1px; }
+.date-field-box:disabled { opacity: 0.6; cursor: not-allowed; }
+.date-field-overlay { color: var(--text-muted); }
+.date-field-value { color: var(--text); }
+.date-field-icon { color: var(--text-muted); flex-shrink: 0; }
+.date-field-pop { position: absolute; z-index: 60; top: calc(100% + 6px); left: 0; }
+/* Keep the popover on screen when the field sits near the right edge. */
+.items-table .date-field-pop, td .date-field-pop { left: auto; right: 0; }
+
+/* --- Item D: the shared RSA calendar --- */
+.rsa-datepicker {
+  width: 300px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  color: var(--text);
+  user-select: none;
+}
+.rsa-dp-head { display: flex; align-items: center; gap: 4px; margin-bottom: 10px; }
+.rsa-dp-title { flex: 1; text-align: center; font-weight: 600; font-size: 14px; }
+.rsa-dp-nav {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg-alt);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+}
+.rsa-dp-nav:hover { border-color: var(--brand-red); color: var(--brand-red); }
+.rsa-dp-weekdays, .rsa-dp-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.rsa-dp-weekdays span { text-align: center; font-size: 11px; color: var(--text-muted); padding: 4px 0; }
+.rsa-dp-day {
+  height: 34px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+.rsa-dp-day:hover:not(:disabled) { background: var(--panel-bg-alt); }
+.rsa-dp-day.is-outside { color: var(--text-muted); opacity: 0.55; }
+.rsa-dp-day.is-today { box-shadow: inset 0 0 0 1px var(--brand-red); }
+.rsa-dp-day.is-selected { background: var(--brand-red); color: #fff; font-weight: 600; }
+.rsa-dp-day:disabled { opacity: 0.3; cursor: not-allowed; }
+.rsa-dp-actions {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 12px; padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.rsa-dp-spacer { flex: 1; }
+.rsa-dp-btn { padding: 8px 14px; border-radius: 8px; font-size: 13px; cursor: pointer; border: 1px solid transparent; }
+.rsa-dp-btn-ghost { background: none; border-color: transparent; color: var(--text-muted); }
+.rsa-dp-btn-ghost:hover { color: var(--brand-red); }
+.rsa-dp-btn-cancel { background: var(--panel-bg); border-color: var(--border); color: var(--text); }
+.rsa-dp-btn-apply { background: var(--brand-red); color: #fff; }
+.rsa-dp-btn:focus-visible { outline: 2px solid var(--brand-red); outline-offset: 1px; }
+
+/* --- Items F + R: the designed dropdown, replacing native <select> --- */
+.rsa-select { position: relative; width: 100%; }
+.rsa-select-trigger {
+  width: 100%;
+  min-height: 38px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--panel-bg);
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.rsa-select-trigger:hover:not(:disabled) { border-color: var(--brand-red); }
+.rsa-select-trigger:focus-visible { outline: 2px solid var(--brand-red); outline-offset: 1px; }
+.rsa-select-trigger[aria-expanded='true'] { border-color: var(--brand-red); }
+.rsa-select-placeholder { color: var(--text-muted); }
+.rsa-select-caret { color: var(--text-muted); transition: transform 0.12s ease; flex-shrink: 0; }
+.rsa-select-trigger[aria-expanded='true'] .rsa-select-caret { transform: rotate(180deg); }
+.rsa-select-menu {
+  position: absolute; z-index: 60; top: calc(100% + 6px); left: 0;
+  min-width: 100%;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  max-height: 280px;
+  overflow-y: auto;
+}
+.rsa-select-search {
+  width: 100%;
+  margin-bottom: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg-alt);
+  color: var(--text);
+  font-size: 13px;
+}
+.rsa-select-option {
+  width: 100%;
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.rsa-select-option:hover, .rsa-select-option.is-active { background: var(--panel-bg-alt); }
+.rsa-select-option.is-selected { font-weight: 600; }
+.rsa-select-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
+.rsa-select-option[data-tone='positive'] .rsa-select-dot { background: var(--green); }
+.rsa-select-option[data-tone='positive'].is-selected { background: rgba(27, 138, 76, 0.12); color: var(--green); }
+.rsa-select-option[data-tone='negative'] .rsa-select-dot { background: #e8590c; }
+.rsa-select-option[data-tone='negative'].is-selected { background: rgba(232, 89, 12, 0.12); color: #e8590c; }
+.rsa-select-option[data-tone='warning'] .rsa-select-dot { background: var(--amber); }
+.rsa-select-empty { padding: 10px 12px; font-size: 12.5px; color: var(--text-muted); }
+.rsa-select-divider { height: 1px; margin: 6px 4px; background: var(--border); }
+.rsa-select-clear {
+  width: 100%;
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  border: none; border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px; text-align: left; cursor: pointer;
+}
+.rsa-select-clear:hover { color: var(--brand-red); background: var(--panel-bg-alt); }
+
+/* --- Item W: the Reports date field was stretching the whole card --- */
+.report-run-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.report-run-row .date-field, .report-run-row .rsa-select { width: 200px; max-width: 100%; }
+.report-run-row input[type='number'] { width: 110px; }
+@media (max-width: 767px) {
+  .report-run-row { flex-direction: column; align-items: stretch; }
+  .report-run-row .date-field, .report-run-row .rsa-select, .report-run-row input[type='number'] { width: 100%; }
+}
+
+/* --- Item N: material stock actions become equal, tappable tabs --- */
+.rsa-tabbar { display: flex; flex-wrap: wrap; gap: 8px; }
+.rsa-tabbar .rsa-tab {
+  flex: 1 1 160px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-bg);
+  color: var(--text);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+}
+.rsa-tabbar .rsa-tab:hover { border-color: var(--brand-red); color: var(--brand-red); }
+.rsa-tabbar .rsa-tab.is-active { background: var(--brand-red); border-color: var(--brand-red); color: #fff; }
+.rsa-tabbar .rsa-tab:focus-visible { outline: 2px solid var(--brand-red); outline-offset: 2px; }
+
+/* --- Item Y: fixed shell, scrolling content pane (desktop web only) --- */
+@media (min-width: 1024px) {
+  .app-body { height: 100vh; overflow: hidden; }
+  .app-sidebar { height: 100vh; overflow-y: auto; position: sticky; top: 0; }
+  .app-content { height: 100vh; overflow-y: auto; }
+}
+
+/* --- Accessibility sweep: visible focus everywhere, comfortable targets --- */
+.btn:focus-visible, button:focus-visible, a:focus-visible,
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--brand-red);
+  outline-offset: 1px;
+}

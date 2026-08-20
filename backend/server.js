@@ -74,6 +74,10 @@ app.use(
   })
 );
 
+// Item U: serves photos saved by the local-disk fallback in
+// config/cloudinary.js. Harmless when Cloudinary is configured - the folder
+// simply stays empty.
+app.use('/uploads', express.static(require('path').join(__dirname, 'uploads'), { maxAge: '7d' }));
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV !== 'test') app.use(morgan('dev'));

@@ -3,7 +3,7 @@ const LabourEntry = require('../models/LabourEntry');
 const SiteLog = require('../models/SiteLog');
 const asyncHandler = require('../utils/asyncHandler');
 const { round2 } = require('../utils/calc');
-const { isCloudinaryConfigured, uploadBufferToCloudinary } = require('../config/cloudinary');
+const { isCloudinaryConfigured, uploadBufferToCloudinary, storeImageBuffer } = require('../config/cloudinary');
 
 /**
  * POST /api/labour/entries
@@ -214,12 +214,10 @@ const getMonthlySalary = asyncHandler(async (req, res) => {
  * day replaces the photo set and location rather than accumulating duplicates.
  */
 const uploadSiteLogPhotos = asyncHandler(async (req, res) => {
-  if (!isCloudinaryConfigured()) {
-    res.status(500);
-    throw new Error(
-      'Photo storage is not set up yet - CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET must be set in the backend environment variables.'
-    );
-  }
+  // Item U: no longer a hard stop. storeImageBuffer() uses Cloudinary when it
+  // is configured and falls back to local disk when it is not, so the screen
+  // works out of the box and the CLOUDINARY_* variables become an
+  // optimisation rather than a prerequisite.
   const { site, date, lat, lng, address, accuracy, note } = req.body;
   if (!site || !String(site).trim()) {
     res.status(400);
@@ -236,7 +234,7 @@ const uploadSiteLogPhotos = asyncHandler(async (req, res) => {
   }
 
   const uploads = await Promise.all(
-    files.map((f) => uploadBufferToCloudinary(f.buffer, 'rsa-construction/site-logs'))
+    files.map((f) => storeImageBuffer(f.buffer, 'rsa-construction/site-logs', {}, f.originalname))
   );
   const photos = uploads.map((result) => ({
     url: result.secure_url,

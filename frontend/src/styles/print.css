@@ -62,6 +62,8 @@
 }
 
 .dn-header-top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--brand-red, #0056cc); padding-bottom: 4px; }
+.dn-company-block { display: flex; align-items: center; gap: 8px; }
+.dn-header-logo { height: 34px; width: auto; object-fit: contain; }
 .dn-company-name { color: var(--brand-red, #0056cc); font-size: 26px; margin: 0; letter-spacing: 0.5px; }
 .dn-company-name-ta { color: var(--brand-red, #0056cc); font-size: 15px; font-weight: 700; }
 .dn-cell-block { text-align: right; color: var(--brand-red, #0056cc); font-size: 12px; font-weight: 700; }
@@ -209,7 +211,7 @@
 .voucher-signature-ta { font-size: 10px; }
 
 @media print {
-  .voucher-sheet { padding: 6mm; width: auto; min-height: 0; }
+  .voucher-sheet { padding: 10mm; width: auto; min-height: 0; }
 }
 
 /* Material Ledger print (ledger-style report) */
@@ -227,7 +229,7 @@
   .print-toolbar { display: none !important; }
 
   body, .print-page-wrapper { background: white; padding: 0; margin: 0; }
-  .delivery-note-sheet { border: none; width: auto; min-height: 0; margin: 0; padding: 8mm; }
+  .delivery-note-sheet { border: none; width: auto; min-height: 0; margin: 0; padding: 10mm; }
   .app-body { display: block; }
   .app-content { padding: 0; max-width: none; }
   .panel { border: none; padding: 0; }
@@ -235,5 +237,10 @@
   .screen-only-ledger { display: none !important; }
   .print-only-ledger { display: block !important; }
 
-  @page { size: A4; margin: 10mm; }
+  /* Item K: a non-zero @page margin is what makes Chrome/Edge print their
+     own header and footer - the black "20/08/2026, 19:29  RSA Construction
+     Management System" line at the top of the sheet. Zeroing the page margin
+     removes that line; the sheet supplies its own 10mm padding below so the
+     printed content keeps exactly the same inset as before. */
+  @page { size: A4; margin: 0; }
 }
